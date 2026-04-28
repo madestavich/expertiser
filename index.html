@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Expertiser — Top 100 Losers</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #0d0d0d;
+        color: #e0e0e0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px;
+        border-bottom: 1px solid #1e1e1e;
+        flex-shrink: 0;
+      }
+      header h1 {
+        font-size: 18px;
+        color: #ff4d4d;
+        font-weight: 600;
+      }
+
+      #load-btn {
+        background: #ff4d4d;
+        color: #fff;
+        border: none;
+        padding: 8px 20px;
+        font-size: 13px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      #load-btn:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      #load-btn:not(:disabled):hover {
+        background: #cc3333;
+      }
+
+      #period-btns {
+        display: flex;
+        gap: 4px;
+      }
+      .period-btn {
+        background: transparent;
+        color: #555;
+        border: 1px solid #222;
+        padding: 5px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+      .period-btn:hover {
+        color: #aaa;
+        border-color: #444;
+      }
+      .period-btn.active {
+        color: #fff;
+        background: #ff4d4d;
+        border-color: #ff4d4d;
+      }
+
+      #load-status {
+        font-size: 12px;
+        color: #555;
+        margin-left: auto;
+      }
+
+      #grid-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+      }
+      #grid-container::-webkit-scrollbar {
+        width: 6px;
+      }
+      #grid-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #grid-container::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+        border-radius: 3px;
+      }
+
+      #grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 10px;
+      }
+
+      .card {
+        background: #111;
+        border: 1px solid #1e1e1e;
+        border-radius: 6px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: border-color 0.15s;
+      }
+      .card:hover {
+        border-color: #333;
+      }
+
+      .card-top {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+      .card-ticker {
+        font-size: 15px;
+        font-weight: 700;
+        color: #e0e0e0;
+      }
+      .card-chg {
+        font-size: 13px;
+        font-weight: 600;
+        color: #ff4d4d;
+      }
+
+      .card-price {
+        font-size: 11px;
+        color: #444;
+      }
+
+      .card-chart {
+        height: 70px;
+        position: relative;
+      }
+      .card-period {
+        font-size: 10px;
+        color: #555;
+        text-align: center;
+        letter-spacing: 0.3px;
+      }
+      .card-chart svg {
+        width: 100%;
+        height: 100%;
+      }
+      .card-chart .loading-text {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: #333;
+      }
+
+      #placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: #333;
+        font-size: 14px;
+        grid-column: 1 / -1;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Top 100 Losers</h1>
+      <div id="period-btns">
+        <button class="period-btn" data-p="1D">1D</button>
+        <button class="period-btn" data-p="5D">5D</button>
+        <button class="period-btn" data-p="1M">1M</button>
+        <button class="period-btn" data-p="3M">3M</button>
+        <button class="period-btn active" data-p="1Y">1Y</button>
+        <button class="period-btn" data-p="2Y">2Y</button>
+        <button class="period-btn" data-p="5Y">5Y</button>
+      </div>
+      <label
+        style="
+          font-size: 12px;
+          color: #777;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-left: 8px;
+        "
+      >
+        Min data:
+        <select
+          id="min-data-filter"
+          style="
+            background: #111;
+            color: #ccc;
+            border: 1px solid #222;
+            border-radius: 3px;
+            padding: 4px 6px;
+            font-size: 12px;
+          "
+        >
+          <option value="0">all</option>
+          <option value="30">≥ 1 month</option>
+          <option value="90">≥ 3 months</option>
+          <option value="180">≥ 6 months</option>
+          <option value="365">≥ 1 year</option>
+          <option value="730">≥ 2 years</option>
+          <option value="1095">≥ 3 years</option>
+          <option value="1825">≥ 5 years</option>
+        </select>
+      </label>
+      <span id="load-status"></span>
+      <button id="load-btn" onclick="loadLosers()">Load Top 100</button>
+    </header>
+
+    <div id="grid-container">
+      <div id="grid">
+        <div id="placeholder">Click "Load Top 100" to start</div>
+      </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+      let currentPeriod = "1Y";
+      let currentLosers = [];
+      const tickerDataDays = {}; // ticker -> days span of CURRENTLY displayed chart
+      const tickerHistoryDays = {}; // ticker -> total available history (days), independent of chart
+      const historyPending = {}; // ticker -> Promise (in-flight probe)
+
+      const PERIOD_MAX_DAYS = {
+        "1D": 1,
+        "5D": 5,
+        "1M": 30,
+        "3M": 90,
+        "6M": 180,
+        "1Y": 365,
+        "2Y": 730,
+        "5Y": 1825,
+      };
+
+      function applyMinDataFilter() {
+        const min =
+          parseInt(document.getElementById("min-data-filter").value, 10) || 0;
+        let hidden = 0,
+          shown = 0,
+          loading = 0;
+        currentLosers.forEach((t) => {
+          const card = document.getElementById(`card-${t.ticker}`);
+          if (!card) return;
+          if (min === 0) {
+            card.style.display = "";
+            shown++;
+            return;
+          }
+          const hist = tickerHistoryDays[t.ticker];
+          // Use chart data span as a lower bound while history probe is loading
+          const known = hist ?? tickerDataDays[t.ticker];
+          if (known === undefined) {
+            // Unknown yet — keep visible (treated as loading)
+            card.style.display = "";
+            loading++;
+            shown++;
+          } else if (known >= min) {
+            card.style.display = "";
+            shown++;
+          } else {
+            card.style.display = "none";
+            hidden++;
+          }
+        });
+        const status = document.getElementById("load-status");
+        if (currentLosers.length) {
+          let text =
+            hidden > 0
+              ? `${shown} shown · ${hidden} hidden`
+              : `${currentLosers.length} losers`;
+          if (loading > 0) text += ` · checking ${loading}`;
+          status.textContent = text;
+        }
+      }
+
+      async function probeHistory(ticker) {
+        if (tickerHistoryDays[ticker] !== undefined) return;
+        if (historyPending[ticker]) return historyPending[ticker];
+        historyPending[ticker] = (async () => {
+          try {
+            // Probe 5Y at weekly resolution (small payload, ~260 points max)
+            const { multiplier, timespan, from, to } = getPeriodParams("5Y");
+            const data = await fetchChartData(
+              ticker,
+              multiplier,
+              timespan,
+              from,
+              to,
+            );
+            if (data.length === 0) {
+              tickerHistoryDays[ticker] = 0;
+            } else {
+              const first = new Date(data[0].time * 1000);
+              const last = new Date(data[data.length - 1].time * 1000);
+              tickerHistoryDays[ticker] = Math.max(
+                1,
+                Math.round((last - first) / 86400000),
+              );
+            }
+          } catch {
+            tickerHistoryDays[ticker] = 0;
+          } finally {
+            delete historyPending[ticker];
+            applyMinDataFilter();
+          }
+        })();
+        return historyPending[ticker];
+      }
+
+      async function probeAllHistories(losers) {
+        const CONCURRENCY = 6;
+        const queue = losers.filter(
+          (t) => tickerHistoryDays[t.ticker] === undefined,
+        );
+        let i = 0;
+        async function next() {
+          if (i >= queue.length) return;
+          const t = queue[i++];
+          await probeHistory(t.ticker);
+          await next();
+        }
+        const workers = Array.from({ length: CONCURRENCY }, () => next());
+        await Promise.all(workers);
+      }
+
+      async function loadLosers() {
+        const btn = document.getElementById("load-btn");
+        const status = document.getElementById("load-status");
+        const grid = document.getElementById("grid");
+
+        btn.disabled = true;
+        status.textContent = "Loading list...";
+        grid.innerHTML = '<div id="placeholder">Loading...</div>';
+
+        try {
+          currentLosers = await fetchTopLosers(100);
+          renderCards(currentLosers);
+          status.textContent = `${currentLosers.length} losers`;
+          loadAllCharts(currentLosers, currentPeriod);
+          probeAllHistories(currentLosers);
+        } catch (err) {
+          grid.innerHTML = `<div id="placeholder" style="color:#ff4d4d">${err.message}</div>`;
+          status.textContent = "";
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      function renderCards(losers) {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+
+        losers.forEach((t, i) => {
+          const price = t.min?.c ?? t.day?.c ?? 0;
+          const card = document.createElement("div");
+          card.className = "card";
+          card.id = `card-${t.ticker}`;
+          card.innerHTML = `
+        <div class="card-top">
+          <span class="card-ticker">${i + 1}. ${t.ticker}</span>
+          <span class="card-chg">${t.todaysChangePerc.toFixed(2)}%</span>
+        </div>
+        <div class="card-price">${price > 0 ? "$" + price.toFixed(2) : "—"}</div>
+        <div class="card-chart" id="chart-${t.ticker}">
+          <div class="loading-text">loading...</div>
+        </div>
+        <div class="card-period" id="period-${t.ticker}"></div>
+      `;
+          grid.appendChild(card);
+        });
+      }
+
+      async function loadAllCharts(losers, period) {
+        const CONCURRENCY = 8;
+        const queue = losers.filter((t) => {
+          const card = document.getElementById(`card-${t.ticker}`);
+          return !card || card.style.display !== "none";
+        });
+        let i = 0;
+
+        async function next() {
+          if (i >= queue.length) return;
+          const t = queue[i++];
+          await loadMiniChart(t.ticker, period);
+          await next();
+        }
+
+        const workers = Array.from({ length: CONCURRENCY }, () => next());
+        await Promise.all(workers);
+      }
+
+      async function loadMiniChart(ticker, period) {
+        const container = document.getElementById(`chart-${ticker}`);
+        const periodEl = document.getElementById(`period-${ticker}`);
+        if (!container) return;
+
+        try {
+          const { multiplier, timespan, from, to } = getPeriodParams(period);
+          const data = await fetchChartData(
+            ticker,
+            multiplier,
+            timespan,
+            from,
+            to,
+          );
+          if (data.length === 0) {
+            container.innerHTML = '<div class="loading-text">no data</div>';
+            if (periodEl) periodEl.textContent = "";
+            tickerDataDays[ticker] = 0;
+            applyMinDataFilter();
+            return;
+          }
+          container.innerHTML = renderSparkline(data);
+          const first = new Date(data[0].time * 1000);
+          const last = new Date(data[data.length - 1].time * 1000);
+          tickerDataDays[ticker] = Math.max(
+            1,
+            Math.round((last - first) / 86400000),
+          );
+          if (periodEl) periodEl.textContent = formatPeriodRange(data);
+          applyMinDataFilter();
+        } catch {
+          container.innerHTML = '<div class="loading-text">error</div>';
+          if (periodEl) periodEl.textContent = "";
+          tickerDataDays[ticker] = 0;
+          applyMinDataFilter();
+        }
+      }
+
+      function formatPeriodRange(data) {
+        const first = new Date(data[0].time * 1000);
+        const last = new Date(data[data.length - 1].time * 1000);
+        const fmt = (d) =>
+          d.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        const days = Math.max(1, Math.round((last - first) / 86400000));
+        let span;
+        if (days < 1) span = "intraday";
+        else if (days < 31) span = `${days}d`;
+        else if (days < 365) span = `${Math.round(days / 30)}mo`;
+        else span = `${(days / 365).toFixed(days < 730 ? 1 : 0)}y`;
+        return `${fmt(first)} → ${fmt(last)} · ${span}`;
+      }
+
+      function renderSparkline(data) {
+        const closes = data.map((d) => d.close);
+        const min = Math.min(...closes);
+        const max = Math.max(...closes);
+        const range = max - min || 1;
+
+        const W = 260,
+          H = 70;
+        const pts = closes.map((v, i) => {
+          const x = (i / (closes.length - 1)) * W;
+          const y = H - ((v - min) / range) * H;
+          return `${x},${y}`;
+        });
+
+        const isDown = closes[closes.length - 1] <= closes[0];
+        const color = isDown ? "#ef5350" : "#26a69a";
+        const gid = "g" + Math.random().toString(36).slice(2);
+
+        const polyline = pts.join(" ");
+        const areaPoints = `0,${H} ${polyline} ${W},${H}`;
+
+        return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <polygon points="${areaPoints}" fill="url(#${gid})" />
+      <polyline points="${polyline}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round"/>
+    </svg>`;
+      }
+
+      // Period switch
+      document.querySelectorAll(".period-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".period-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentPeriod = btn.dataset.p;
+          if (currentLosers.length) {
+            // Reset charts to loading state
+            currentLosers.forEach((t) => {
+              const c = document.getElementById(`chart-${t.ticker}`);
+              if (c) c.innerHTML = '<div class="loading-text">loading...</div>';
+              const p = document.getElementById(`period-${t.ticker}`);
+              if (p) p.textContent = "";
+              delete tickerDataDays[t.ticker];
+            });
+            applyMinDataFilter();
+            loadAllCharts(currentLosers, currentPeriod);
+          }
+        });
+      });
+
+      document
+        .getElementById("min-data-filter")
+        .addEventListener("change", () => {
+          applyMinDataFilter();
+          if (currentLosers.length) probeAllHistories(currentLosers);
+        });
+    </script>
+  </body>
+</html>
