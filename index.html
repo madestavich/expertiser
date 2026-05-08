@@ -30,6 +30,39 @@
         padding: 12px 20px;
         border-bottom: 1px solid #1e1e1e;
         flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+
+      #main {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+      }
+
+      .filter-label {
+        font-size: 12px;
+        color: #777;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .filter-label select,
+      .filter-label input {
+        background: #111;
+        color: #ccc;
+        border: 1px solid #222;
+        border-radius: 3px;
+        padding: 4px 6px;
+        font-size: 12px;
+        font-family: inherit;
+      }
+      .filter-label input[type="number"] {
+        width: 70px;
+      }
+      .filter-label input:focus,
+      .filter-label select:focus {
+        outline: none;
+        border-color: #ff4d4d;
       }
       header h1 {
         font-size: 18px;
@@ -87,6 +120,7 @@
         flex: 1;
         overflow-y: auto;
         padding: 16px;
+        min-width: 0;
       }
       #grid-container::-webkit-scrollbar {
         width: 6px;
@@ -113,10 +147,18 @@
         display: flex;
         flex-direction: column;
         gap: 6px;
-        transition: border-color 0.15s;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        cursor: pointer;
+        user-select: none;
       }
       .card:hover {
         border-color: #333;
+      }
+      .card.selected {
+        border-color: #ff4d4d;
+        box-shadow: 0 0 0 1px #ff4d4d inset;
       }
 
       .card-top {
@@ -136,8 +178,10 @@
       }
 
       .card-price {
-        font-size: 11px;
-        color: #444;
+        font-size: 13px;
+        font-weight: 500;
+        color: #c8c8c8;
+        letter-spacing: 0.2px;
       }
 
       .card-chart {
@@ -173,6 +217,223 @@
         font-size: 14px;
         grid-column: 1 / -1;
       }
+
+      #detail-panel {
+        width: 30%;
+        min-width: 320px;
+        flex-shrink: 0;
+        border-left: 1px solid #1e1e1e;
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      #detail-panel.hidden {
+        display: none;
+      }
+
+      #detail-tabs {
+        display: flex;
+        gap: 2px;
+        padding: 8px 8px 0;
+        border-bottom: 1px solid #1e1e1e;
+        overflow-x: auto;
+        flex-shrink: 0;
+      }
+      #detail-tabs::-webkit-scrollbar {
+        height: 4px;
+      }
+      #detail-tabs::-webkit-scrollbar-thumb {
+        background: #2a2a2a;
+      }
+      .detail-tab {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #111;
+        border: 1px solid #1e1e1e;
+        border-bottom: none;
+        border-radius: 4px 4px 0 0;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: #888;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .detail-tab:hover {
+        color: #ccc;
+      }
+      .detail-tab.active {
+        color: #fff;
+        background: #1a1a1a;
+        border-color: #333;
+      }
+      .detail-tab-close {
+        color: #555;
+        font-size: 14px;
+        line-height: 1;
+        padding: 0 4px;
+        border-radius: 2px;
+      }
+      .detail-tab-close:hover {
+        color: #ff4d4d;
+        background: #2a1010;
+      }
+
+      #detail-chart-area {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        gap: 10px;
+      }
+      .detail-chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .detail-chart-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #e0e0e0;
+      }
+      .detail-chart-meta {
+        font-size: 12px;
+        color: #777;
+      }
+      .detail-chart-svg {
+        flex: 1;
+        min-height: 220px;
+        position: relative;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+      }
+      .detail-chart-svg.panning {
+        cursor: grabbing;
+      }
+      .detail-chart-svg svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .detail-zoom-hint {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        font-size: 10px;
+        color: #555;
+        pointer-events: none;
+      }
+      .detail-zoom-reset {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-size: 10px;
+        color: #888;
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        padding: 2px 6px;
+        border-radius: 3px;
+        cursor: pointer;
+        display: none;
+      }
+      .detail-zoom-reset.visible {
+        display: inline-block;
+      }
+      .detail-zoom-reset:hover {
+        color: #fff;
+        border-color: #ff4d4d;
+      }
+      .detail-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        font-size: 11px;
+      }
+      .detail-stat {
+        background: #111;
+        border: 1px solid #1e1e1e;
+        border-radius: 4px;
+        padding: 6px 8px;
+      }
+      .detail-stat-label {
+        color: #666;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .detail-stat-value {
+        color: #e0e0e0;
+        font-weight: 600;
+        margin-top: 2px;
+      }
+
+      #detail-prompt-area {
+        border-top: 1px solid #1e1e1e;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      #ai-prompt {
+        background: #111;
+        color: #e0e0e0;
+        border: 1px solid #222;
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 13px;
+        font-family: inherit;
+        resize: none;
+        min-height: 60px;
+      }
+      #ai-prompt:focus {
+        outline: none;
+        border-color: #ff4d4d;
+      }
+      #ai-prompt-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+      #ai-context-info {
+        font-size: 11px;
+        color: #666;
+      }
+      #ai-send {
+        background: #ff4d4d;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        font-size: 12px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      #ai-send:hover {
+        background: #cc3333;
+      }
+      #ai-send:disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+      #ai-response {
+        background: #0a0a0a;
+        border: 1px solid #1e1e1e;
+        border-radius: 4px;
+        padding: 8px 10px;
+        font-size: 12px;
+        color: #aaa;
+        max-height: 120px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        display: none;
+      }
+      #ai-response.visible {
+        display: block;
+      }
     </style>
   </head>
   <body>
@@ -188,28 +449,12 @@
         <button class="period-btn" data-p="5Y">5Y</button>
       </div>
       <label
-        style="
-          font-size: 12px;
-          color: #777;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-left: 8px;
-        "
+        class="filter-label"
+        title="Hide stocks whose available price history is shorter than the chosen age"
       >
-        Min data:
-        <select
-          id="min-data-filter"
-          style="
-            background: #111;
-            color: #ccc;
-            border: 1px solid #222;
-            border-radius: 3px;
-            padding: 4px 6px;
-            font-size: 12px;
-          "
-        >
-          <option value="0">all</option>
+        Stock age:
+        <select id="min-data-filter">
+          <option value="0">any</option>
           <option value="30">≥ 1 month</option>
           <option value="90">≥ 3 months</option>
           <option value="180">≥ 6 months</option>
@@ -219,14 +464,59 @@
           <option value="1825">≥ 5 years</option>
         </select>
       </label>
+      <label class="filter-label" title="Filter by current price">
+        Price:
+        <input
+          id="price-min"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="min"
+        />
+        <span style="color: #444">–</span>
+        <input
+          id="price-max"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="max"
+        />
+      </label>
       <span id="load-status"></span>
       <button id="load-btn" onclick="loadLosers()">Load Top 100</button>
     </header>
 
-    <div id="grid-container">
-      <div id="grid">
-        <div id="placeholder">Click "Load Top 100" to start</div>
+    <div id="main">
+      <div id="grid-container">
+        <div id="grid">
+          <div id="placeholder">Click "Load Top 100" to start</div>
+        </div>
       </div>
+
+      <aside id="detail-panel" class="hidden">
+        <div id="detail-tabs"></div>
+        <div id="detail-chart-area">
+          <div class="detail-chart-header">
+            <span class="detail-chart-title" id="detail-title">—</span>
+            <span class="detail-chart-meta" id="detail-meta"></span>
+          </div>
+          <div class="detail-chart-svg" id="detail-chart-svg">
+            <div class="loading-text">select a stock</div>
+          </div>
+          <div class="detail-stats" id="detail-stats"></div>
+        </div>
+        <div id="detail-prompt-area">
+          <textarea
+            id="ai-prompt"
+            placeholder="Ask AI about the selected stock(s)..."
+          ></textarea>
+          <div id="ai-prompt-row">
+            <span id="ai-context-info">no stocks selected</span>
+            <button id="ai-send">Send</button>
+          </div>
+          <div id="ai-response"></div>
+        </div>
+      </aside>
     </div>
 
     <script src="config.js"></script>
@@ -237,6 +527,13 @@
       const tickerDataDays = {}; // ticker -> days span of CURRENTLY displayed chart
       const tickerHistoryDays = {}; // ticker -> total available history (days), independent of chart
       const historyPending = {}; // ticker -> Promise (in-flight probe)
+
+      // Selection state
+      const selectedTickers = new Set();
+      let activeTab = null; // ticker currently shown in detail panel
+      const detailDataCache = {}; // `${ticker}|${period}` -> data array
+      const zoomRanges = {}; // `${ticker}|${period}` -> {start, end}
+      let currentDetail = null; // { ticker, period, data, key }
 
       const PERIOD_MAX_DAYS = {
         "1D": 1,
@@ -249,29 +546,47 @@
         "5Y": 1825,
       };
 
-      function applyMinDataFilter() {
-        const min =
+      function applyFilters() {
+        const minAge =
           parseInt(document.getElementById("min-data-filter").value, 10) || 0;
+        const priceMinRaw = document.getElementById("price-min").value;
+        const priceMaxRaw = document.getElementById("price-max").value;
+        const priceMin = priceMinRaw === "" ? null : parseFloat(priceMinRaw);
+        const priceMax = priceMaxRaw === "" ? null : parseFloat(priceMaxRaw);
+
         let hidden = 0,
           shown = 0,
           loading = 0;
         currentLosers.forEach((t) => {
           const card = document.getElementById(`card-${t.ticker}`);
           if (!card) return;
-          if (min === 0) {
+
+          // Price filter (immediate, uses snapshot price)
+          const price = t.min?.c ?? t.day?.c ?? 0;
+          if (priceMin !== null && !isNaN(priceMin) && price < priceMin) {
+            card.style.display = "none";
+            hidden++;
+            return;
+          }
+          if (priceMax !== null && !isNaN(priceMax) && price > priceMax) {
+            card.style.display = "none";
+            hidden++;
+            return;
+          }
+
+          // Age filter (depends on probe)
+          if (minAge === 0) {
             card.style.display = "";
             shown++;
             return;
           }
           const hist = tickerHistoryDays[t.ticker];
-          // Use chart data span as a lower bound while history probe is loading
           const known = hist ?? tickerDataDays[t.ticker];
           if (known === undefined) {
-            // Unknown yet — keep visible (treated as loading)
             card.style.display = "";
             loading++;
             shown++;
-          } else if (known >= min) {
+          } else if (known >= minAge) {
             card.style.display = "";
             shown++;
           } else {
@@ -289,6 +604,9 @@
           status.textContent = text;
         }
       }
+
+      // Backwards-compat alias
+      const applyMinDataFilter = applyFilters;
 
       async function probeHistory(ticker) {
         if (tickerHistoryDays[ticker] !== undefined) return;
@@ -349,6 +667,14 @@
         status.textContent = "Loading list...";
         grid.innerHTML = '<div id="placeholder">Loading...</div>';
 
+        // Reset selection between loads
+        selectedTickers.clear();
+        activeTab = null;
+        for (const k of Object.keys(detailDataCache)) delete detailDataCache[k];
+        for (const k of Object.keys(zoomRanges)) delete zoomRanges[k];
+        currentDetail = null;
+        renderDetailPanel();
+
         try {
           currentLosers = await fetchTopLosers(100);
           renderCards(currentLosers);
@@ -372,6 +698,8 @@
           const card = document.createElement("div");
           card.className = "card";
           card.id = `card-${t.ticker}`;
+          card.dataset.ticker = t.ticker;
+          if (selectedTickers.has(t.ticker)) card.classList.add("selected");
           card.innerHTML = `
         <div class="card-top">
           <span class="card-ticker">${i + 1}. ${t.ticker}</span>
@@ -383,6 +711,7 @@
         </div>
         <div class="card-period" id="period-${t.ticker}"></div>
       `;
+          card.addEventListener("click", () => toggleSelection(t.ticker));
           grid.appendChild(card);
         });
       }
@@ -512,8 +841,14 @@
               if (p) p.textContent = "";
               delete tickerDataDays[t.ticker];
             });
-            applyMinDataFilter();
+            // Invalidate detail cache for new period
+            for (const k of Object.keys(detailDataCache))
+              delete detailDataCache[k];
+            for (const k of Object.keys(zoomRanges)) delete zoomRanges[k];
+            currentDetail = null;
+            applyFilters();
             loadAllCharts(currentLosers, currentPeriod);
+            if (activeTab) renderDetailChart(activeTab);
           }
         });
       });
@@ -521,9 +856,397 @@
       document
         .getElementById("min-data-filter")
         .addEventListener("change", () => {
-          applyMinDataFilter();
+          applyFilters();
           if (currentLosers.length) probeAllHistories(currentLosers);
         });
+      document
+        .getElementById("price-min")
+        .addEventListener("input", applyFilters);
+      document
+        .getElementById("price-max")
+        .addEventListener("input", applyFilters);
+
+      // ---------- Selection & detail panel ----------
+      function toggleSelection(ticker) {
+        if (selectedTickers.has(ticker)) {
+          selectedTickers.delete(ticker);
+          if (activeTab === ticker) {
+            activeTab = selectedTickers.size
+              ? selectedTickers.values().next().value
+              : null;
+          }
+        } else {
+          selectedTickers.add(ticker);
+          activeTab = ticker;
+        }
+        const card = document.getElementById(`card-${ticker}`);
+        if (card)
+          card.classList.toggle("selected", selectedTickers.has(ticker));
+        renderDetailPanel();
+      }
+
+      function renderDetailPanel() {
+        const panel = document.getElementById("detail-panel");
+        const tabsEl = document.getElementById("detail-tabs");
+        const ctxInfo = document.getElementById("ai-context-info");
+
+        if (selectedTickers.size === 0) {
+          panel.classList.add("hidden");
+          tabsEl.innerHTML = "";
+          ctxInfo.textContent = "no stocks selected";
+          return;
+        }
+        panel.classList.remove("hidden");
+
+        // Build tabs in selection order
+        tabsEl.innerHTML = "";
+        for (const tk of selectedTickers) {
+          const tab = document.createElement("div");
+          tab.className = "detail-tab" + (tk === activeTab ? " active" : "");
+          tab.innerHTML = `<span>${tk}</span><span class="detail-tab-close" title="Remove">×</span>`;
+          tab.addEventListener("click", (e) => {
+            if (e.target.classList.contains("detail-tab-close")) {
+              e.stopPropagation();
+              toggleSelection(tk);
+              return;
+            }
+            activeTab = tk;
+            renderDetailPanel();
+          });
+          tabsEl.appendChild(tab);
+        }
+
+        ctxInfo.textContent =
+          selectedTickers.size === 1
+            ? `1 stock selected: ${activeTab}`
+            : `${selectedTickers.size} stocks selected`;
+
+        if (activeTab) renderDetailChart(activeTab);
+      }
+
+      async function renderDetailChart(ticker) {
+        const titleEl = document.getElementById("detail-title");
+        const metaEl = document.getElementById("detail-meta");
+        const svgEl = document.getElementById("detail-chart-svg");
+        const statsEl = document.getElementById("detail-stats");
+
+        const loser = currentLosers.find((t) => t.ticker === ticker);
+        titleEl.textContent = ticker;
+        metaEl.textContent = currentPeriod;
+        svgEl.innerHTML = '<div class="loading-text">loading...</div>';
+        statsEl.innerHTML = "";
+
+        const cacheKey = `${ticker}|${currentPeriod}`;
+        let data = detailDataCache[cacheKey];
+        if (!data) {
+          try {
+            const { multiplier, timespan, from, to } =
+              getPeriodParams(currentPeriod);
+            data = await fetchChartData(ticker, multiplier, timespan, from, to);
+            detailDataCache[cacheKey] = data;
+          } catch {
+            svgEl.innerHTML = '<div class="loading-text">error</div>';
+            return;
+          }
+        }
+
+        // Guard against tab switching during async fetch
+        if (activeTab !== ticker) return;
+
+        if (!data || data.length === 0) {
+          svgEl.innerHTML = '<div class="loading-text">no data</div>';
+          return;
+        }
+
+        // Initialize / preserve zoom range for this ticker+period
+        if (!zoomRanges[cacheKey]) {
+          zoomRanges[cacheKey] = { start: 0, end: data.length - 1 };
+        } else {
+          // Clamp in case data length changed
+          const r = zoomRanges[cacheKey];
+          r.start = Math.max(0, Math.min(r.start, data.length - 2));
+          r.end = Math.max(r.start + 1, Math.min(r.end, data.length - 1));
+        }
+
+        currentDetail = { ticker, period: currentPeriod, data, key: cacheKey };
+        redrawDetailSlice();
+        attachZoomHandlers(svgEl);
+        metaEl.textContent = `${currentPeriod} · ${formatPeriodRange(data)}`;
+      }
+
+      function redrawDetailSlice() {
+        if (!currentDetail) return;
+        const { data, key, ticker } = currentDetail;
+        if (activeTab !== ticker) return;
+        const range = zoomRanges[key];
+        const slice = data.slice(range.start, range.end + 1);
+
+        const svgEl = document.getElementById("detail-chart-svg");
+        const statsEl = document.getElementById("detail-stats");
+        const metaEl = document.getElementById("detail-meta");
+        const resetBtn = document.getElementById("detail-zoom-reset");
+
+        if (slice.length < 2) {
+          // Don't allow degenerate slice
+          range.start = Math.max(0, range.end - 1);
+          return;
+        }
+
+        svgEl.innerHTML =
+          renderDetailedChart(slice) +
+          `<div class="detail-zoom-hint">scroll = zoom · drag = pan</div>` +
+          `<button class="detail-zoom-reset${
+            range.start === 0 && range.end === data.length - 1 ? "" : " visible"
+          }" id="detail-zoom-reset" title="Reset zoom">reset</button>`;
+
+        const newResetBtn = document.getElementById("detail-zoom-reset");
+        if (newResetBtn) {
+          newResetBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            zoomRanges[key] = { start: 0, end: data.length - 1 };
+            redrawDetailSlice();
+          });
+        }
+
+        // Update stats based on visible slice
+        const loser = currentLosers.find((t) => t.ticker === ticker);
+        const closes = slice.map((d) => d.close);
+        const min = Math.min(...closes);
+        const max = Math.max(...closes);
+        const first = closes[0];
+        const last = closes[closes.length - 1];
+        const chg = ((last - first) / first) * 100;
+        const todaysPerc = loser ? loser.todaysChangePerc : null;
+
+        statsEl.innerHTML = `
+          <div class="detail-stat">
+            <div class="detail-stat-label">Last</div>
+            <div class="detail-stat-value">$${last.toFixed(2)}</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-label">Range Δ</div>
+            <div class="detail-stat-value" style="color:${chg < 0 ? "#ef5350" : "#26a69a"}">${chg.toFixed(2)}%</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-label">Low</div>
+            <div class="detail-stat-value">$${min.toFixed(2)}</div>
+          </div>
+          <div class="detail-stat">
+            <div class="detail-stat-label">High</div>
+            <div class="detail-stat-value">$${max.toFixed(2)}</div>
+          </div>
+          ${
+            todaysPerc !== null
+              ? `<div class="detail-stat" style="grid-column: span 4">
+            <div class="detail-stat-label">Today</div>
+            <div class="detail-stat-value" style="color:#ef5350">${todaysPerc.toFixed(2)}%</div>
+          </div>`
+              : ""
+          }
+        `;
+
+        const isFull =
+          range.start === 0 && range.end === currentDetail.data.length - 1;
+        metaEl.textContent = isFull
+          ? `${currentDetail.period} · ${formatPeriodRange(currentDetail.data)}`
+          : `${currentDetail.period} · zoom · ${formatPeriodRange(slice)}`;
+      }
+
+      function attachZoomHandlers(svgEl) {
+        if (svgEl.dataset.zoomBound === "1") return;
+        svgEl.dataset.zoomBound = "1";
+
+        svgEl.addEventListener(
+          "wheel",
+          (e) => {
+            if (!currentDetail) return;
+            e.preventDefault();
+            const range = zoomRanges[currentDetail.key];
+            const total = currentDetail.data.length;
+            if (!range || total < 3) return;
+
+            const rect = svgEl.getBoundingClientRect();
+            const frac = Math.max(
+              0,
+              Math.min(1, (e.clientX - rect.left) / rect.width),
+            );
+            const span = range.end - range.start;
+            const anchor = range.start + frac * span;
+
+            // Wheel up (deltaY < 0) zoom in, down zoom out
+            const factor = e.deltaY < 0 ? 0.8 : 1.25;
+            let newSpan = Math.max(2, Math.min(total - 1, span * factor));
+            let newStart = Math.round(anchor - frac * newSpan);
+            let newEnd = Math.round(newStart + newSpan);
+
+            if (newStart < 0) {
+              newEnd -= newStart;
+              newStart = 0;
+            }
+            if (newEnd > total - 1) {
+              newStart -= newEnd - (total - 1);
+              newEnd = total - 1;
+            }
+            newStart = Math.max(0, newStart);
+            newEnd = Math.min(total - 1, newEnd);
+            if (newEnd - newStart < 2) return;
+
+            range.start = newStart;
+            range.end = newEnd;
+            redrawDetailSlice();
+          },
+          { passive: false },
+        );
+
+        let dragState = null;
+        svgEl.addEventListener("pointerdown", (e) => {
+          if (!currentDetail) return;
+          // Don't start pan when clicking the reset button
+          if (
+            e.target &&
+            e.target.classList &&
+            e.target.classList.contains("detail-zoom-reset")
+          )
+            return;
+          const range = zoomRanges[currentDetail.key];
+          if (!range) return;
+          dragState = {
+            startX: e.clientX,
+            width: svgEl.getBoundingClientRect().width,
+            startStart: range.start,
+            startEnd: range.end,
+          };
+          svgEl.classList.add("panning");
+          svgEl.setPointerCapture(e.pointerId);
+        });
+        svgEl.addEventListener("pointermove", (e) => {
+          if (!dragState || !currentDetail) return;
+          const range = zoomRanges[currentDetail.key];
+          const total = currentDetail.data.length;
+          const span = dragState.startEnd - dragState.startStart;
+          const dx = e.clientX - dragState.startX;
+          const indexShift = -Math.round((dx / dragState.width) * span);
+          let newStart = dragState.startStart + indexShift;
+          let newEnd = dragState.startEnd + indexShift;
+          if (newStart < 0) {
+            newEnd -= newStart;
+            newStart = 0;
+          }
+          if (newEnd > total - 1) {
+            newStart -= newEnd - (total - 1);
+            newEnd = total - 1;
+          }
+          if (newStart === range.start && newEnd === range.end) return;
+          range.start = newStart;
+          range.end = newEnd;
+          redrawDetailSlice();
+        });
+        const endDrag = (e) => {
+          if (!dragState) return;
+          dragState = null;
+          svgEl.classList.remove("panning");
+          try {
+            svgEl.releasePointerCapture(e.pointerId);
+          } catch {}
+        };
+        svgEl.addEventListener("pointerup", endDrag);
+        svgEl.addEventListener("pointercancel", endDrag);
+        svgEl.addEventListener("pointerleave", endDrag);
+
+        // Double-click to reset
+        svgEl.addEventListener("dblclick", () => {
+          if (!currentDetail) return;
+          zoomRanges[currentDetail.key] = {
+            start: 0,
+            end: currentDetail.data.length - 1,
+          };
+          redrawDetailSlice();
+        });
+      }
+
+      function renderDetailedChart(data) {
+        const closes = data.map((d) => d.close);
+        const min = Math.min(...closes);
+        const max = Math.max(...closes);
+        const range = max - min || 1;
+
+        const W = 600,
+          H = 300,
+          padL = 40,
+          padR = 8,
+          padT = 8,
+          padB = 22;
+        const innerW = W - padL - padR;
+        const innerH = H - padT - padB;
+
+        const pts = closes.map((v, i) => {
+          const x = padL + (i / (closes.length - 1)) * innerW;
+          const y = padT + innerH - ((v - min) / range) * innerH;
+          return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+
+        const isDown = closes[closes.length - 1] <= closes[0];
+        const color = isDown ? "#ef5350" : "#26a69a";
+        const gid = "dg" + Math.random().toString(36).slice(2);
+
+        const polyline = pts.join(" ");
+        const areaPoints = `${padL},${padT + innerH} ${polyline} ${padL + innerW},${padT + innerH}`;
+
+        // Y axis labels (3 ticks)
+        const yTicks = [max, (max + min) / 2, min];
+        const yLabels = yTicks
+          .map((v, i) => {
+            const y = padT + (i * innerH) / 2;
+            return `<text x="${padL - 6}" y="${y + 3}" text-anchor="end" fill="#555" font-size="10">$${v.toFixed(2)}</text>
+                    <line x1="${padL}" y1="${y}" x2="${padL + innerW}" y2="${y}" stroke="#1a1a1a" stroke-width="1"/>`;
+          })
+          .join("");
+
+        // X axis labels (start, mid, end dates)
+        const fmt = (t) =>
+          new Date(t * 1000).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "2-digit",
+          });
+        const xPositions = [0, Math.floor(data.length / 2), data.length - 1];
+        const xLabels = xPositions
+          .map((i) => {
+            const x = padL + (i / (data.length - 1)) * innerW;
+            const anchor =
+              i === 0 ? "start" : i === data.length - 1 ? "end" : "middle";
+            return `<text x="${x}" y="${H - 6}" text-anchor="${anchor}" fill="#555" font-size="10">${fmt(data[i].time)}</text>`;
+          })
+          .join("");
+
+        return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${yLabels}
+      <polygon points="${areaPoints}" fill="url(#${gid})" />
+      <polyline points="${polyline}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linejoin="round"/>
+      ${xLabels}
+    </svg>`;
+      }
+
+      // AI prompt stub (integration point)
+      document.getElementById("ai-send").addEventListener("click", () => {
+        const prompt = document.getElementById("ai-prompt").value.trim();
+        const respEl = document.getElementById("ai-response");
+        if (!prompt) return;
+        if (selectedTickers.size === 0) {
+          respEl.textContent = "Select at least one stock first.";
+          respEl.classList.add("visible");
+          return;
+        }
+        const ctx = Array.from(selectedTickers).join(", ");
+        respEl.textContent = `(AI integration not yet connected)\nContext: ${ctx}\nPrompt: ${prompt}`;
+        respEl.classList.add("visible");
+      });
     </script>
   </body>
 </html>
